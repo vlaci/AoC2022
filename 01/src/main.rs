@@ -1,3 +1,5 @@
+use std::cmp::Reverse;
+
 use color_eyre::eyre::{Context, Result};
 
 fn main() -> Result<()> {
@@ -23,9 +25,9 @@ fn parse_input(input: &str) -> Result<Calories> {
             e.trim()
                 .split('\n')
                 .map(|n| n.parse().wrap_err_with(|| format!("Not an int {:?}", n)))
-                .collect::<Result<Vec<i32>>>()
+                .collect()
         })
-        .collect::<Result<Vec<_>>>()
+        .collect()
 }
 
 fn find_max(calories: &Calories) -> i32 {
@@ -33,13 +35,9 @@ fn find_max(calories: &Calories) -> i32 {
 }
 
 fn find_total(calories: &Calories, top_n: usize) -> i32 {
-    let mut sorted = calories.clone();
-    sorted.sort_by_key(|e| -e.iter().sum::<i32>());
-    sorted
-        .iter()
-        .take(top_n)
-        .map(|e| e.iter().sum::<i32>())
-        .sum()
+    let mut sums: Vec<_> = calories.iter().map(|e| e.iter().sum()).collect();
+    sums.sort_by_key(|e| Reverse(*e));
+    sums.iter().take(top_n).sum()
 }
 
 #[cfg(test)]
@@ -84,6 +82,7 @@ mod tests {
     #[rstest]
     fn test_parse(input: &str, calories: Calories) {
         let parsed = parse_input(input).unwrap();
+
         assert_eq!(parsed, calories);
     }
 

@@ -13,4 +13,4 @@ members = [
 
 [workspace.dependencies]
 libaoc = { path = "./libaoc" }
-color-eyre = "0.6"
+color-eyre = { version = "0.6", default-features = false }
