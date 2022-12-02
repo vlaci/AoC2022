@@ -85,6 +85,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "day02"
+version = "0.1.0"
+dependencies = [
+ "color-eyre",
+ "indoc",
+ "libaoc",
+ "pretty_assertions",
+ "rstest",
+]
+
+[[package]]
 name = "diff"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
