@@ -9,6 +9,7 @@ members = [
     "libaoc",
     "01",
     "02",
+    "03",
 ]
 
 [workspace.dependencies]
