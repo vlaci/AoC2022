@@ -102,6 +102,7 @@
             cargo
             clippy
             rustc
+            rustfmt
             pre-commit
           ];
         };
