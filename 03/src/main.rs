@@ -1,22 +1,24 @@
 use std::{collections::HashSet, str::FromStr};
 
 use color_eyre::{eyre::eyre, Report, Result};
+use derive_more::{Add, Display, From, Sum};
 use itertools::Itertools;
 
 fn main() -> Result<()> {
     let input = libaoc::init()?;
 
     let sacks = to_sacks(&input)?;
-    let prio = sacks.iter().map(RuckSack::common).sum::<Result<u32>>()?;
+    let prio = sacks
+        .iter()
+        .map(RuckSack::common)
+        .sum::<Result<Priority>>()?;
 
     println!("The sum of priorities is {prio}");
 
-    let groups = to_groups(&sacks).unwrap();
-
-    let prio = groups
+    let prio: Priority = to_groups(&sacks)?
         .into_iter()
-        .map(|p| p.into_iter().map(|p| *p).sum::<u32>())
-        .sum::<u32>();
+        .map(|p| p.into_iter().sum())
+        .sum();
 
     println!("The sum of priorities is {prio}");
 
@@ -28,15 +30,9 @@ struct RuckSack {
     second_compartment: HashSet<char>,
 }
 
+#[repr(transparent)]
+#[derive(Display, Debug, PartialEq, From, Add, Sum)]
 struct Priority(u32);
-
-impl core::ops::Deref for Priority {
-    type Target = u32;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
 
 impl TryFrom<&char> for Priority {
     type Error = Report;
@@ -51,13 +47,13 @@ impl TryFrom<&char> for Priority {
 }
 
 impl RuckSack {
-    fn common(&self) -> Result<u32> {
+    fn common(&self) -> Result<Priority> {
         let prios = self
             .first_compartment
             .intersection(&self.second_compartment)
             .map(Priority::try_from)
             .collect::<Result<Vec<_>>>()?;
-        Ok(prios.into_iter().map(|p| *p).sum())
+        Ok(prios.into_iter().sum())
     }
 
     fn common_2(&self) -> HashSet<char> {
@@ -137,10 +133,10 @@ mod tests {
         let prio = sacks
             .iter()
             .map(RuckSack::common)
-            .sum::<Result<u32>>()
+            .sum::<Result<Priority>>()
             .unwrap();
 
-        assert_eq!(prio, 157);
+        assert_eq!(prio, 157.into());
     }
     #[rstest]
     fn test_second(input: &str) {
@@ -149,9 +145,9 @@ mod tests {
 
         let sum = groups
             .into_iter()
-            .map(|p| p.into_iter().map(|p| *p).sum::<u32>())
-            .sum::<u32>();
+            .map(|p| p.into_iter().sum::<Priority>())
+            .sum::<Priority>();
 
-        assert_eq!(sum, 70);
+        assert_eq!(sum, 70.into());
     }
 }
