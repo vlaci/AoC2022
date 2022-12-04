@@ -1,5 +1,4 @@
 [workspace.package]
-version = "0.1.0"
 edition = "2021"
 authors = ["László Vaskó <1771332+vlaci@users.noreply.github.com>"]
 license = "Unlicense"
