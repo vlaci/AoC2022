@@ -104,6 +104,9 @@
             rustc
             rustfmt
             pre-commit
+            ocaml
+            ocamlPackages.findlib
+            ocamlPackages.ppx_inline_test
           ];
         };
       });

@@ -1,0 +1,12 @@
+(executable
+ (public_name day01)
+ (name main)
+ (modules main)
+ (libraries libaoc lib01))
+
+(library
+ (name lib01)
+ (modules Lib01)
+ (libraries str)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test)))

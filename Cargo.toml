@@ -6,13 +6,13 @@ license = "Unlicense"
 [workspace]
 resolver = "2"
 members = [
-    "libaoc",
-    "01",
+    "libaoc/rust",
+    "01/rust",
     "02",
     "03",
     "04",
 ]
 
 [workspace.dependencies]
-libaoc = { path = "./libaoc" }
+libaoc = { path = "./libaoc/rust" }
 color-eyre = { version = "0.6", default-features = false }
