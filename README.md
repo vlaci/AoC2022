@@ -15,4 +15,8 @@
 
 ## [04](04)
 
-- [Rust](04/rust/src/main.rs)
+- [Rust](04/src/main.rs)
+
+## [05](05)
+
+- [Rust](05/rust/src/main.rs)
