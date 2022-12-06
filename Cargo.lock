@@ -150,6 +150,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "day06"
+version = "0.6.0"
+dependencies = [
+ "color-eyre",
+ "libaoc",
+ "pretty_assertions",
+ "rstest",
+]
+
+[[package]]
 name = "derive_more"
 version = "0.99.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
