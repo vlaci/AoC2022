@@ -1,6 +1,5 @@
-use std::collections::HashSet;
-
 use color_eyre::{eyre::ContextCompat, Result};
+use itertools::Itertools;
 
 fn main() -> Result<()> {
     let input = libaoc::init()?;
@@ -22,12 +21,10 @@ fn start_of_message(buf: &str) -> Option<usize> {
 }
 
 fn find_unique_pattern(buf: &str, len: usize) -> Option<usize> {
-    for (pos, win) in buf.as_bytes().windows(len).enumerate() {
-        if win.iter().collect::<HashSet<_>>().len() == len {
-            return Some(pos + len);
-        }
-    }
-    None
+    buf.as_bytes()
+        .windows(len)
+        .position(|win| win.iter().unique().count() == len)
+        .map(|pos| pos + len)
 }
 
 #[cfg(test)]

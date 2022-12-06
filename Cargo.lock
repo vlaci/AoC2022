@@ -151,9 +151,10 @@ dependencies = [
 
 [[package]]
 name = "day06"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "color-eyre",
+ "itertools",
  "libaoc",
  "pretty_assertions",
  "rstest",
