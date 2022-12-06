@@ -7,14 +7,24 @@ fn main() -> Result<()> {
 
     let start = start_of_packet(&input).wrap_err("No start-of-packet found")?;
     println!("Start-of-packet found at {start}");
+    let start = start_of_message(&input).wrap_err("No start-of-message found")?;
+    println!("Start-of-message found at {start}");
 
     Ok(())
 }
 
 fn start_of_packet(buf: &str) -> Option<usize> {
-    for (pos, win) in buf.as_bytes().windows(4).enumerate() {
-        if win.iter().collect::<HashSet<_>>().len() == 4 {
-            return Some(pos + 4);
+    find_unique_pattern(buf, 4)
+}
+
+fn start_of_message(buf: &str) -> Option<usize> {
+    find_unique_pattern(buf, 14)
+}
+
+fn find_unique_pattern(buf: &str, len: usize) -> Option<usize> {
+    for (pos, win) in buf.as_bytes().windows(len).enumerate() {
+        if win.iter().collect::<HashSet<_>>().len() == len {
+            return Some(pos + len);
         }
     }
     None
@@ -28,12 +38,13 @@ mod tests {
     use super::*;
 
     #[rstest]
-    #[case("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 7)]
-    #[case("bvwbjplbgvbhsrlpgdmjqwftvncz", 5)]
-    #[case("nppdvjthqldpwncqszvftbrmjlhg", 6)]
-    #[case("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10)]
-    #[case("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11)]
-    fn test_start_of_packet(#[case] buf: &str, #[case] start: usize) {
-        assert_eq!(start_of_packet(buf), Some(start));
+    #[case("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 7, 19)]
+    #[case("bvwbjplbgvbhsrlpgdmjqwftvncz", 5, 23)]
+    #[case("nppdvjthqldpwncqszvftbrmjlhg", 6, 23)]
+    #[case("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10, 29)]
+    #[case("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11, 26)]
+    fn test_start(#[case] buf: &str, #[case] packet_start: usize, #[case] message_start: usize) {
+        assert_eq!(start_of_packet(buf), Some(packet_start));
+        assert_eq!(start_of_message(buf), Some(message_start));
     }
 }
