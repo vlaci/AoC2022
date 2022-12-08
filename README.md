@@ -28,3 +28,7 @@
 ## [07](07)
 
 - [Rust](07/src/main.rs)
+
+## [08](08)
+
+- [Rust](08/src/main.rs)
