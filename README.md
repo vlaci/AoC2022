@@ -24,3 +24,7 @@
 ## [06](06)
 
 - [Rust](06/src/main.rs)
+
+## [07](07)
+
+- [Rust](07/src/main.rs)

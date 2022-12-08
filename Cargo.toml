@@ -13,6 +13,7 @@ members = [
     "04",
     "05",
     "06",
+    "07",
 ]
 
 [workspace.dependencies]
