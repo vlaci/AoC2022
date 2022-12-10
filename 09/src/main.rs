@@ -1,4 +1,5 @@
-use std::{cmp, collections::HashSet, fmt::Display, ops, str::FromStr};
+use lending_iterator::prelude::*;
+use std::{collections::HashSet, ops, str::FromStr};
 
 use color_eyre::{
     eyre::{eyre, ContextCompat},
@@ -9,7 +10,13 @@ fn main() -> Result<()> {
     let input = libaoc::init()?;
 
     let moves = parse_moves(&input).unwrap();
-    let mut r = Rope::new();
+    let mut r: Rope<2> = Rope::new();
+    moves.iter().for_each(|m| {
+        r.step(m);
+    });
+
+    println!("The tail touched {} positions", r.touched());
+    let mut r: Rope<10> = Rope::new();
     moves.iter().for_each(|m| {
         r.step(m);
     });
@@ -93,41 +100,48 @@ impl FromStr for Move {
     }
 }
 
-#[derive(Default)]
-struct Rope {
-    head: Coord,
-    tail: Coord,
+struct Rope<const N: usize> {
+    coords: [Coord; N],
     touched: HashSet<Coord>,
 }
 
-impl Rope {
-    fn new() -> Self {
-        let mut r: Self = Default::default();
-        r.touched.insert(r.tail);
+impl<const N: usize> Rope<N> {
+    fn new() -> Rope<N> {
+        let mut r = Rope {
+            coords: [Default::default(); N],
+            touched: Default::default(),
+        };
+        r.touched.insert(Default::default());
         r
     }
 
     fn step(&mut self, m: &Move) {
         for _ in 0..m.steps {
-            self.head += m.direction;
+            self.coords[0] += m.direction;
+            let mut windows = self.coords.windows_mut::<2>();
+            let mut i = 1;
+            while let Some(&mut [head, ref mut tail]) = windows.next() {
+                i += 1;
 
-            let dx = self.head.0 - self.tail.0;
-            let dy = self.head.1 - self.tail.1;
+                let dx = head.0 - tail.0;
+                let dy = head.1 - tail.1;
 
-            if dx.abs() > 1 {
-                self.tail += Direction::Right * dx;
-                if dy.abs() == 1 {
-                    self.tail += Direction::Up * dy;
+                if dx.abs() > 1 {
+                    *tail += Direction::Right * dx;
+                    if dy.abs() == 1 {
+                        *tail += Direction::Up * dy;
+                    }
                 }
-                self.touched.insert(self.tail);
-            }
 
-            if dy.abs() > 1 {
-                self.tail += Direction::Up * dy;
-                if dx.abs() == 1 {
-                    self.tail += Direction::Right * dx;
+                if dy.abs() > 1 {
+                    *tail += Direction::Up * dy;
+                    if dx.abs() == 1 {
+                        *tail += Direction::Right * dx;
+                    }
                 }
-                self.touched.insert(self.tail);
+                if i == N {
+                    self.touched.insert(*tail);
+                }
             }
         }
     }
@@ -135,38 +149,23 @@ impl Rope {
     fn touched(&self) -> usize {
         self.touched.len()
     }
-}
 
-impl Display for Rope {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let width = cmp::max(
-            self.touched.iter().map(|c| c.0).max().unwrap_or(0),
-            self.head.0,
-        );
-        let height = cmp::max(
-            self.touched.iter().map(|c| c.1).max().unwrap_or(0),
-            self.head.1,
-        );
-        f.write_fmt(format_args!(
-            "head: {}, {}, tail {}, {}\n",
-            self.head.0, self.head.1, self.tail.0, self.tail.1,
-        ))?;
-        for y in (0..=height).rev() {
-            for x in 0..=width {
+    #[allow(dead_code)]
+    fn print(&self, a: (i32, i32), b: (i32, i32)) {
+        for y in (a.1..=b.1).rev() {
+            for x in a.0..=b.0 {
                 let coord = Coord(x, y);
-                if coord == self.head {
-                    f.write_str("H")?;
-                } else if coord == self.tail {
-                    f.write_str("T")?;
+                if let Some(i) = self.coords.iter().position(|&c| c == coord) {
+                    eprint!("{i}");
                 } else if self.touched.contains(&coord) {
-                    f.write_str("#")?;
+                    eprint!("#");
                 } else {
-                    f.write_str(".")?;
+                    eprint!(".");
                 }
             }
-            f.write_str("\n")?;
+            eprintln!();
         }
-        Ok(())
+        eprintln!();
     }
 }
 
@@ -200,11 +199,38 @@ mod tests {
     #[rstest]
     fn test_parsing(input: &str) {
         let moves = parse_moves(input).unwrap();
-        let mut r = Rope::new();
+        let mut r: Rope<2> = Rope::new();
         moves.iter().for_each(|m| {
             r.step(m);
         });
 
         assert_eq!(r.touched(), 13);
+        let mut r: Rope<10> = Rope::new();
+        moves.iter().for_each(|m| {
+            r.step(m);
+        });
+        assert_eq!(r.touched(), 1);
+    }
+
+    #[rstest]
+    fn test_long() {
+        let input = indoc! {"
+            R 5
+            U 8
+            L 8
+            D 3
+            R 17
+            D 10
+            L 25
+            U 20
+        "};
+        let mut r: Rope<10> = Rope::new();
+
+        let moves = parse_moves(input).unwrap();
+        moves.iter().for_each(|m| {
+            r.step(m);
+        });
+
+        assert_eq!(r.touched(), 36);
     }
 }
