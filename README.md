@@ -32,3 +32,11 @@
 ## [08](08)
 
 - [Rust](08/src/main.rs)
+
+## [09](09)
+
+- [Rust](09/src/main.rs)
+
+## [10](10)
+
+- [Rust](10/src/main.rs)

@@ -100,6 +100,8 @@
           # Extra inputs can be added here
           nativeBuildInputs = with pkgs; [
             cargo
+            cargo-nextest
+            watchexec
             clippy
             rustc
             rustfmt
